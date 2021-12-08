@@ -26,7 +26,7 @@ namespace GlobalBlue.CustomerManager.Application.Update
             if(customer.EmailAddress != request.NewEmailAddress)
             {
                 var existingCustomer = await _customerStorage.GetByEmailAddressAsync(request.NewEmailAddress);
-                if (existingCustomer != null) throw new CustomerConflictException($"Another customer already exists with this e-mail address: {request.NewEmailAddress}");
+                if (existingCustomer != null) throw new CustomerEmailAddressConflictException(request.NewEmailAddress);
             }
 
             customer.EmailAddress = request.NewEmailAddress;

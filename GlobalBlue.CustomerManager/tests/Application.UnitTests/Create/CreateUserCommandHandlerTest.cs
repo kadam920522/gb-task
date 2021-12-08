@@ -40,7 +40,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Create
             _customerStorageMock.Setup(storage => storage.GetByEmailAddressAsync(EXISTING_EMAIL_ADDRESS)).ReturnsAsync(new Customer());
 
             // Act
-            Func<Task<int>> act = () => _sut.Handle(command, It.IsAny<CancellationToken>());
+            Func<Task<Customer>> act = () => _sut.Handle(command, It.IsAny<CancellationToken>());
 
             // Assert
             act.Should().ThrowAsync<CustomerConflictException>().WithMessage($"Customer already exists with the following e-mail address: {EXISTING_EMAIL_ADDRESS}");
@@ -60,19 +60,19 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Create
                 NON_EXISTING_EMAIL_ADDRESS,
                 PASSWORD);
 
-            const int NEWLY_CREATED_CUSTOMER_ID = 13;
+            var expectedCustomer = new Customer() { Id = 13 };
 
             _customerStorageMock.Setup(storage => storage.GetByEmailAddressAsync(NON_EXISTING_EMAIL_ADDRESS)).ReturnsAsync(default(Customer));
             _passwordHasherMock.Setup(hasher => hasher.Hash(PASSWORD)).Returns(HASHED_PASSWORD);
             _customerStorageMock
                 .Setup(storage => storage.AddAsync(It.Is<Customer>(customer => ShouldBe(customer, NON_EXISTING_EMAIL_ADDRESS, HASHED_PASSWORD))))
-                .ReturnsAsync(NEWLY_CREATED_CUSTOMER_ID);
+                .ReturnsAsync(expectedCustomer);
 
             // Act
-            var customerId = await _sut.Handle(command, It.IsAny<CancellationToken>());
+            var newCustomer = await _sut.Handle(command, It.IsAny<CancellationToken>());
 
             // Assert
-            customerId.Should().Be(NEWLY_CREATED_CUSTOMER_ID);
+            newCustomer.Id.Should().Be(expectedCustomer.Id);
         }
 
         private static bool ShouldBe(Customer customer, string emailAddress, string hashedPassword) =>

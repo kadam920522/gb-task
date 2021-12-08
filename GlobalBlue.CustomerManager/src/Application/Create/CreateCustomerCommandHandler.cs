@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GlobalBlue.CustomerManager.Application.Create
 {
-    internal sealed class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerCommand, int>
+    internal sealed class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerCommand, Customer>
     {
         private readonly ICustomerStorage _customerStorage;
         private readonly IPasswordHasher _passwordHasher;
@@ -18,14 +18,14 @@ namespace GlobalBlue.CustomerManager.Application.Create
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<int> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
+        public async Task<Customer> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
             var customer = await _customerStorage.GetByEmailAddressAsync(request.EmailAddress);
-            if (customer != null) throw new CustomerConflictException($"Customer already exists with the following e-mail address: {request.EmailAddress}");
+            if (customer != null) throw new CustomerEmailAddressConflictException(request.EmailAddress);
 
             customer = Map(request);
-            var newCustomerId = await _customerStorage.AddAsync(customer);
-            return newCustomerId;
+            customer = await _customerStorage.AddAsync(customer);
+            return customer;
         }
 
         private Customer Map(CreateCustomerCommand command) => new Customer

@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using GlobalBlue.CustomerManager.Application.Common.Abstract;
+using GlobalBlue.CustomerManager.Application.Common.Concrete;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -12,6 +14,7 @@ namespace GlobalBlue.CustomerManager.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddTransient<ICustomerStorage, InMemoryCustomerStorage>();
 
             return services;
         }

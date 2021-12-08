@@ -12,9 +12,9 @@ namespace GlobalBlue.CustomerManager.Application.Common.Abstract
 
         Task<Customer> GetById(int id);
 
-        Task<int> AddAsync(Customer newCustomer);
+        Task<Customer> AddAsync(Customer newCustomer);
 
-        Task UpdateAsync(Customer updatedCustomer);
+        Task<Customer> UpdateAsync(Customer updatedCustomer);
 
     }
 }

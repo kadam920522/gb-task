@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using GlobalBlue.CustomerManager.Application.Entites;
+using MediatR;
 
 namespace GlobalBlue.CustomerManager.Application.Create
 {
-    public sealed class CreateCustomerCommand : IRequest<int>
+    public sealed class CreateCustomerCommand : IRequest<Customer>
     {
         public CreateCustomerCommand(string firstName, string surname, string emailAddress, string password)
         {
