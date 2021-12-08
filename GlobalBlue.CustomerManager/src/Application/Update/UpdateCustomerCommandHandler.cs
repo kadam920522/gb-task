@@ -1,4 +1,4 @@
-﻿using GlobalBlue.CustomerManager.Application.Common;
+﻿using GlobalBlue.CustomerManager.Application.Common.Abstract;
 using GlobalBlue.CustomerManager.Application.Exceptions;
 using MediatR;
 using System.Threading;
