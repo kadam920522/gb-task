@@ -1,4 +1,4 @@
-﻿using GlobalBlue.CustomerManager.Application.Entites;
+﻿using GlobalBlue.CustomerManager.Application.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

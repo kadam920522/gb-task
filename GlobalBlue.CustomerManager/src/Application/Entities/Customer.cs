@@ -1,4 +1,4 @@
-﻿namespace GlobalBlue.CustomerManager.Application.Entites
+﻿namespace GlobalBlue.CustomerManager.Application.Entities
 {
     public sealed class Customer
     {

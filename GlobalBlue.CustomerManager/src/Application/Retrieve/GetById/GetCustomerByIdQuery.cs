@@ -1,4 +1,4 @@
-﻿using GlobalBlue.CustomerManager.Application.Entites;
+﻿using GlobalBlue.CustomerManager.Application.Entities;
 using MediatR;
 
 namespace GlobalBlue.CustomerManager.Application.Retrieve.GetById

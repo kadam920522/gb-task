@@ -1,5 +1,5 @@
 ﻿using GlobalBlue.CustomerManager.Application.Common.Abstract;
-using GlobalBlue.CustomerManager.Application.Entites;
+using GlobalBlue.CustomerManager.Application.Entities;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
