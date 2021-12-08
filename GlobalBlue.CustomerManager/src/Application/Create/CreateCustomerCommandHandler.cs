@@ -1,11 +1,11 @@
-﻿using Application.Common;
-using Application.Entites;
-using Application.Exceptions;
+﻿using GlobalBlue.CustomerManager.Application.Common;
+using GlobalBlue.CustomerManager.Application.Entites;
+using GlobalBlue.CustomerManager.Application.Exceptions;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.Create
+namespace GlobalBlue.CustomerManager.Application.Create
 {
     internal sealed class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerCommand, int>
     {

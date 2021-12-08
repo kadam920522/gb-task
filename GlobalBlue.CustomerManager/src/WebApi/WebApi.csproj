@@ -5,6 +5,7 @@
     <UserSecretsId>26bdec0a-6f98-446a-a3fb-7ebefd5a621f</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<AssemblyName>GlobalBlue.CustomerManager.WebApi</AssemblyName>
+	<RootNamespace>GlobalBlue.CustomerManager.WebApi</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

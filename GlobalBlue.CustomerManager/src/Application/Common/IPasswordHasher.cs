@@ -1,4 +1,4 @@
-﻿namespace Application.Common
+﻿namespace GlobalBlue.CustomerManager.Application.Common
 {
     public interface IPasswordHasher
     {

@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
 	<AssemblyName>GlobalBlue.CustomerManager.Application.UnitTests</AssemblyName>
+	<RootNamespace>GlobalBlue.CustomerManager.Application.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

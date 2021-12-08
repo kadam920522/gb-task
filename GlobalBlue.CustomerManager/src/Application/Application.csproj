@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
 	<AssemblyName>GlobalBlue.CustomerManager.Application</AssemblyName>
+	<RootNamespace>GlobalBlue.CustomerManager.Application</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

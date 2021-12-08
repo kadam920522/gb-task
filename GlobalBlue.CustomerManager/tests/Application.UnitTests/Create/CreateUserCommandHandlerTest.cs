@@ -1,17 +1,15 @@
-﻿using Application.Common;
-using Application.Create;
-using Application.Entites;
-using Application.Exceptions;
-using FluentAssertions;
+﻿using FluentAssertions;
+using GlobalBlue.CustomerManager.Application.Common;
+using GlobalBlue.CustomerManager.Application.Create;
+using GlobalBlue.CustomerManager.Application.Entites;
+using GlobalBlue.CustomerManager.Application.Exceptions;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Application.UnitTests.Create
+namespace GlobalBlue.CustomerManager.Application.UnitTests.Create
 {
     public sealed class CreateUserCommandHandlerTest
     {
@@ -74,9 +72,10 @@ namespace Application.UnitTests.Create
             var customerId = await _sut.Handle(command, It.IsAny<CancellationToken>());
 
             // Assert
-            customerId.Should().Be(NEWLY_CREATED_CUSTOMER_ID);        }
+            customerId.Should().Be(NEWLY_CREATED_CUSTOMER_ID);
+        }
 
-        private static bool ShouldBe(Customer customer, string emailAddress, string hashedPassword) => 
+        private static bool ShouldBe(Customer customer, string emailAddress, string hashedPassword) =>
             customer.EmailAddress == emailAddress && customer.Password == hashedPassword;
     }
 }

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("GlobalBlue.CustomerManager.Application.UnitTests")]
 
-namespace Application
+namespace GlobalBlue.CustomerManager.Application
 {
     public static class DependencyInjection
     {

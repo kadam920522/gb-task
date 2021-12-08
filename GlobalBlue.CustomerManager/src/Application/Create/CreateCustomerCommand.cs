@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Application.Create
+namespace GlobalBlue.CustomerManager.Application.Create
 {
     public sealed class CreateCustomerCommand : IRequest<int>
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Application.Exceptions
+namespace GlobalBlue.CustomerManager.Application.Exceptions
 {
     public sealed class CustomerConflictException : Exception
     {
