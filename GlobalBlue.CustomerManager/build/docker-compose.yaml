@@ -2,7 +2,7 @@ version: '3.2'
 
 services:  
 
-  customer_manager_db:
+  db:
     image: postgres
     environment:
       POSTGRES_USER: customer_manager_webapi
@@ -11,19 +11,19 @@ services:
     ports:
       - 5432:5432
     networks:
-      - customer-manager-app-network
+      - app_network
   
-  customer_manager_webapi:
+  webapi:
     image: customer-manager-webapi
     ports:
       - 5010:80
     depends_on:
-      - customer_manager_db
+      - db
     networks:
-      - customer-manager-app-network
+      - app_network
     environment:
-      DbConnectionString: "Host=customer_manager_db;port=5432;Database=customer_manager_db;Username=customer_manager_webapi;Password=customer_manager"
+      DbConnectionString: "Host=db;port=5432;Database=customer_manager_db;Username=customer_manager_webapi;Password=customer_manager"
 
 networks:
-  customer-manager-app-network:
+  app_network:
     driver: bridge

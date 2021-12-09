@@ -1,0 +1,1 @@
+docker-compose -p customer_manager down
