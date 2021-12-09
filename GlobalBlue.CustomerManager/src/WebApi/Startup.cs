@@ -1,4 +1,5 @@
 using GlobalBlue.CustomerManager.Application;
+using GlobalBlue.CustomerManager.Persistence;
 using GlobalBlue.CustomerManager.WebApi.Extensions;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Builder;
@@ -31,7 +32,7 @@ namespace GlobalBlue.CustomerManager.WebApi
                 .AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
 
             services.AddApplication();
-
+            services.AddPersistence(Configuration);
             services.AddPasswordHasher();
         }
 
