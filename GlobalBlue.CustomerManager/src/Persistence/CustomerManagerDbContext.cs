@@ -1,10 +1,9 @@
 ﻿using GlobalBlue.CustomerManager.Application.Entities;
-using GlobalBlue.CustomerManager.Persistence.Abstract;
 using Microsoft.EntityFrameworkCore;
 
 namespace GlobalBlue.CustomerManager.Persistence
 {
-    internal sealed class CustomerManagerDbContext : DbContext, ICustomerManagerDbContext
+    internal sealed class CustomerManagerDbContext : DbContext
     {
         public CustomerManagerDbContext(DbContextOptions<CustomerManagerDbContext> options) : base(options)
         {
