@@ -17,7 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "src\Persiste
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{DA5D60CF-3110-47E3-8849-43B2E0DD1FFC}"
 	ProjectSection(SolutionItems) = preProject
+		build\BuildImage.ps1 = build\BuildImage.ps1
 		build\docker-compose.yaml = build\docker-compose.yaml
+		build\SetupContainers.ps1 = build\SetupContainers.ps1
+		build\TeardownContainers.ps1 = build\TeardownContainers.ps1
 	EndProjectSection
 EndProject
 Global

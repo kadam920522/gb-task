@@ -1,4 +1,6 @@
-﻿using GlobalBlue.CustomerManager.Application.Common.Abstract;
+﻿using FluentValidation;
+using GlobalBlue.CustomerManager.Application.Common.Abstract;
+using GlobalBlue.CustomerManager.Application.Common.Behaviors;
 using GlobalBlue.CustomerManager.Application.Common.Concrete;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +15,13 @@ namespace GlobalBlue.CustomerManager.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            services.AddMediatR(Assembly.GetExecutingAssembly());
+            var assembly = Assembly.GetExecutingAssembly();
+
+            services.AddMediatR(assembly);
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+            services.AddValidatorsFromAssembly(assembly);
+
             services.AddTransient<ICustomerStorage, InMemoryCustomerStorage>();
 
             return services;
