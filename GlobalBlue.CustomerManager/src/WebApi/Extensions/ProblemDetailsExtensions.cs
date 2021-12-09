@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using GlobalBlue.CustomerManager.Application.Exceptions;
+using GlobalBlue.CustomerManager.WebApi.ProblemDetails;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,15 +27,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Extensions
             // Custom mapping function for FluentValidation's ValidationException.
             options.MapFluentValidationException();
 
-            // You can configure the middleware to re-throw certain types of exceptions, all exceptions or based on a predicate.
-            // This is useful if you have upstream middleware that needs to do additional handling of exceptions.
-            //options.Rethrow<NotSupportedException>();
-
-            // This will map NotImplementedException to the 501 Not Implemented status code.
-            //options.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
-
-            // This will map HttpRequestException to the 503 Service Unavailable status code.
-            //options.MapToStatusCode<HttpRequestException>(StatusCodes.Status503ServiceUnavailable);
+            options.MapCustomerConflictException();
 
             options.MapToStatusCode<CustomerNotFoundException>(StatusCodes.Status404NotFound);
 
@@ -43,11 +36,18 @@ namespace GlobalBlue.CustomerManager.WebApi.Extensions
             options.MapToStatusCode<Exception>(StatusCodes.Status500InternalServerError);
         }
 
-        public static void MapFluentValidationException(this ProblemDetailsOptions options) =>
+        private static void MapCustomerConflictException(this ProblemDetailsOptions options) =>
+            options.Map<CustomerConflictException>((ctx, ex) =>
+            {
+                var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+                var details = factory.CreateProblemDetails(ctx, StatusCodes.Status409Conflict);
+                return new CustomerConflicProblemDetails(details, ex);
+            });
+
+        private static void MapFluentValidationException(this ProblemDetailsOptions options) =>
             options.Map<ValidationException>((ctx, ex) =>
             {
                 var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
-
                 var errors = ex.Errors
                     .GroupBy(x => x.PropertyName)
                     .ToDictionary(
@@ -55,6 +55,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Extensions
                         x => x.Select(x => x.ErrorMessage).ToArray());
 
                 return factory.CreateValidationProblemDetails(ctx, errors);
+                
             });
     }
 }
