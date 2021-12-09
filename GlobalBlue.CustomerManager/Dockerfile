@@ -7,14 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 WORKDIR /src
-COPY ["GlobalBlue.CustomerManager.WebApi/GlobalBlue.CustomerManager.WebApi.csproj", "GlobalBlue.CustomerManager.WebApi/"]
-RUN dotnet restore "GlobalBlue.CustomerManager.WebApi/GlobalBlue.CustomerManager.WebApi.csproj"
+COPY ["src/WebApi/WebApi.csproj", "src/WebApi/"]
+COPY ["src/Application/Application.csproj", "src/Application/"]
+COPY ["src/Persistence/Persistence.csproj", "src/Persistence/"]
+RUN dotnet restore "src/WebApi/WebApi.csproj"
 COPY . .
-WORKDIR "/src/GlobalBlue.CustomerManager.WebApi"
-RUN dotnet build "GlobalBlue.CustomerManager.WebApi.csproj" -c Release -o /app/build
+WORKDIR "/src/src/WebApi"
+RUN dotnet build "WebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "GlobalBlue.CustomerManager.WebApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "WebApi.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

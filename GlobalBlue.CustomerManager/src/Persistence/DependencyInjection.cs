@@ -10,7 +10,8 @@ namespace GlobalBlue.CustomerManager.Persistence
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<CustomerManagerDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DbConnectionString")));
+            var connectionString = configuration.GetValue<string>("DbConnectionString");
+            services.AddDbContext<CustomerManagerDbContext>(options => options.UseNpgsql(connectionString));
             services.AddTransient<ICustomerStorage, CustomerStorage>();
 
             return services;

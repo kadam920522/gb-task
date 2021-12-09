@@ -39,6 +39,9 @@ namespace GlobalBlue.CustomerManager.WebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
+            //Automatically apply migrations
+            app.ApplicationServices.ApplyMigrations();
+
             app.UseProblemDetails();
 
             app.UseHttpsRedirection();
