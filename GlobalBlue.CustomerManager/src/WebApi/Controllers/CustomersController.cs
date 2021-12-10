@@ -46,6 +46,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Customer))]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(CustomerConflicProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ValidationProblemDetails))]
         public async Task<IActionResult> Post([FromBody] CustomerDto dto)
         {
             var command = MapToCommand(dto);
@@ -58,6 +59,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(CustomerConflicProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ValidationProblemDetails))]
         public async Task<IActionResult> Put(int id, [FromBody] CustomerDto dto)
         {
             var command = MapToCommand(id, dto);
