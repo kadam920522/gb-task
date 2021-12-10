@@ -10,7 +10,7 @@ namespace GlobalBlue.CustomerManager.Application.Common.Abstract
 
         Task<Customer> GetByEmailAddressAsync(string emailAddress);
 
-        Task<Customer> GetById(int id);
+        Task<Customer> GetByIdAsync(int id);
 
         Task<Customer> AddAsync(Customer newCustomer);
 

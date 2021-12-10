@@ -18,7 +18,7 @@ namespace GlobalBlue.CustomerManager.Application.Retrieve.GetById
 
         public async Task<Customer> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
         {
-            var customer = await _customerStorage.GetById(request.Id);
+            var customer = await _customerStorage.GetByIdAsync(request.Id);
             if (customer is null) throw new CustomerNotFoundException(request.Id);
 
             return customer;

@@ -19,7 +19,7 @@ namespace GlobalBlue.CustomerManager.Application.Update
 
         public async Task<Unit> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
         {
-            var customer = await _customerStorage.GetById(request.CustomerId);
+            var customer = await _customerStorage.GetByIdAsync(request.CustomerId);
 
             if (customer is null) throw new CustomerNotFoundException(request.CustomerId);
 

@@ -33,7 +33,7 @@ namespace GlobalBlue.CustomerManager.Persistence.Common.Concrete
             return await _dbContext.Customers.FirstOrDefaultAsync(customer => customer.EmailAddress == emailAddress);
         }
 
-        public async Task<Customer> GetById(int id)
+        public async Task<Customer> GetByIdAsync(int id)
         {
             return await _dbContext.Customers.FirstOrDefaultAsync(customer => customer.Id == id);
         }

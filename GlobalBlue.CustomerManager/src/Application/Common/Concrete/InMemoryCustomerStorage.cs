@@ -25,7 +25,7 @@ namespace GlobalBlue.CustomerManager.Application.Common.Concrete
         public Task<Customer> GetByEmailAddressAsync(string emailAddress) =>
             Task.FromResult(_customers.FirstOrDefault(customer => customer.EmailAddress == emailAddress));
 
-        public Task<Customer> GetById(int id) =>
+        public Task<Customer> GetByIdAsync(int id) =>
             Task.FromResult(_customers.FirstOrDefault(customer => customer.Id == id));
 
         public Task<Customer> UpdateAsync(Customer updatedCustomer)
