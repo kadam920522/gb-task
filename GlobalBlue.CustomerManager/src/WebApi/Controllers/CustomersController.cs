@@ -1,10 +1,14 @@
 ﻿using GlobalBlue.CustomerManager.Application.Create;
+using GlobalBlue.CustomerManager.Application.Entities;
 using GlobalBlue.CustomerManager.Application.Retrieve.GetAll;
 using GlobalBlue.CustomerManager.Application.Retrieve.GetById;
 using GlobalBlue.CustomerManager.Application.Update;
 using GlobalBlue.CustomerManager.WebApi.DataTransferObjects;
+using GlobalBlue.CustomerManager.WebApi.ProblemDetails;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GlobalBlue.CustomerManager.WebApi.Controllers
@@ -21,6 +25,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Customer>))]
         public async Task<IActionResult> Get()
         {
             var customers = await _sender.Send(new GetAllCustomerQuery());
@@ -28,6 +33,8 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Customer))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         public async Task<IActionResult> Get(int id)
         {
             var customer = await _sender.Send(new GetCustomerByIdQuery(id));
@@ -36,6 +43,9 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Customer))]
+        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(CustomerConflicProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         public async Task<IActionResult> Post([FromBody] CustomerDto dto)
         {
             var command = MapToCommand(dto);
@@ -45,6 +55,9 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(CustomerConflicProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         public async Task<IActionResult> Put(int id, [FromBody] CustomerDto dto)
         {
             var command = MapToCommand(id, dto);

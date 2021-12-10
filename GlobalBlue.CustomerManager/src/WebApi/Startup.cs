@@ -34,6 +34,11 @@ namespace GlobalBlue.CustomerManager.WebApi
             services.AddApplication();
             services.AddPersistence(Configuration);
             services.AddPasswordHasher();
+
+            services.AddOpenApiDocument(settings =>
+            {
+                settings.Title = "Customer Manager API";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,9 +51,10 @@ namespace GlobalBlue.CustomerManager.WebApi
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
+            app.UseOpenApi(); // serve OpenAPI/Swagger documents
+            app.UseSwaggerUi3(); // serve Swagger UI
 
-            app.UseAuthorization();
+            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
