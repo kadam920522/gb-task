@@ -70,12 +70,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:5011/api/customers",
-					"protocol": "https",
+					"raw": "http://localhost:5010/api/customers",
+					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "5011",
+					"port": "5010",
 					"path": [
 						"api",
 						"customers"
