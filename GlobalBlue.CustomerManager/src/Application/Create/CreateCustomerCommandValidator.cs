@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using GlobalBlue.CustomerManager.Application.ValueObjects;
 
 namespace GlobalBlue.CustomerManager.Application.Create
 {
@@ -8,7 +9,7 @@ namespace GlobalBlue.CustomerManager.Application.Create
         {
             RuleFor(command => command.FirstName).NotNull().NotEmpty();
             RuleFor(command => command.Surname).NotNull().NotEmpty();
-            RuleFor(command => command.EmailAddress).NotNull().NotEmpty();
+            RuleFor(command => command.EmailAddress).NotNull().NotEmpty().Must(emailAddress => EmailAddress.IsValid(emailAddress));
             RuleFor(command => command.Password).NotNull().NotEmpty();
         }
     }

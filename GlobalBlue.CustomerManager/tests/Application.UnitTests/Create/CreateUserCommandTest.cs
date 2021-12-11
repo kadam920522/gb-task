@@ -78,6 +78,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Create
         [InlineData(FIRST_NAME, "", EMAIL_ADDRESS, PASSWORD)]
         [InlineData(FIRST_NAME, SURNAME, null, PASSWORD)]
         [InlineData(FIRST_NAME, SURNAME, "", PASSWORD)]
+        [InlineData(FIRST_NAME, SURNAME, "invalidEmailAddress", PASSWORD)]
         [InlineData(FIRST_NAME, SURNAME, EMAIL_ADDRESS, null)]
         [InlineData(FIRST_NAME, SURNAME, EMAIL_ADDRESS, "")]
         public void ShouldThrowValidationException_WhenOneOfRequiredFieldIsNullOrEmpty(string firstName, string surname, string emailAddress, string password)

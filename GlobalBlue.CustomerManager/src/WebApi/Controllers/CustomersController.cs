@@ -3,14 +3,16 @@ using GlobalBlue.CustomerManager.Application.Entities;
 using GlobalBlue.CustomerManager.Application.Retrieve.GetAll;
 using GlobalBlue.CustomerManager.Application.Retrieve.GetById;
 using GlobalBlue.CustomerManager.Application.Update;
-using GlobalBlue.CustomerManager.WebApi.DataTransferObjects;
 using GlobalBlue.CustomerManager.WebApi.ProblemDetails;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using CustomerRequestDto = GlobalBlue.CustomerManager.WebApi.DataTransferObjects.Request.CustomerDto;
+using CustomerResponseDto = GlobalBlue.CustomerManager.WebApi.DataTransferObjects.Response.CustomerDto;
 
 namespace GlobalBlue.CustomerManager.WebApi.Controllers
 {
@@ -26,37 +28,37 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Customer>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CustomerResponseDto>))]
         [OpenApiOperation("Fetch all customers", "This endpoint is used to fetch all available customers")]
         public async Task<IActionResult> Get()
         {
             var customers = await _sender.Send(new GetAllCustomerQuery());
-            return Ok(customers);
+            return Ok(customers.Select(customer => MapToResponseDto(customer)));
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Customer))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerResponseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         [OpenApiOperation("Fetch the specified customer", "This endpoint tends to return the customer by the specified id.")]
         public async Task<IActionResult> Get(int id)
         {
             var customer = await _sender.Send(new GetCustomerByIdQuery(id));
 
-            return Ok(customer);
+            return Ok(MapToResponseDto(customer));
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Customer))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CustomerResponseDto))]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(CustomerConflicProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ValidationProblemDetails))]
         [OpenApiOperation("Create a new customer", "This endpoint tends to create new customer.")]
-        public async Task<IActionResult> Post([FromBody] CustomerDto dto)
+        public async Task<IActionResult> Post([FromBody] CustomerRequestDto dto)
         {
             var command = MapToCommand(dto);
             var newCustomer = await _sender.Send(command);
 
-            return CreatedAtAction(nameof(Get), new { id = newCustomer.Id }, newCustomer);
+            return CreatedAtAction(nameof(Get), new { id = newCustomer.Id }, MapToResponseDto(newCustomer));
         }
 
         [HttpPut("{id}")]
@@ -65,7 +67,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ValidationProblemDetails))]
         [OpenApiOperation("Update the specified customer", "This endpoint tends to update customer specified by it's id.")]
-        public async Task<IActionResult> Put(int id, [FromBody] CustomerDto dto)
+        public async Task<IActionResult> Put(int id, [FromBody] CustomerRequestDto dto)
         {
             var command = MapToCommand(id, dto);
             await _sender.Send(command);
@@ -73,10 +75,19 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
             return NoContent();
         }
 
-        private UpdateCustomerCommand MapToCommand(int id, CustomerDto dto) =>
+        private UpdateCustomerCommand MapToCommand(int id, CustomerRequestDto dto) =>
             new UpdateCustomerCommand(id, dto.FirstName, dto.Surname, dto.EmailAddress, dto.Password);
 
-        private CreateCustomerCommand MapToCommand(CustomerDto dto) =>
+        private CreateCustomerCommand MapToCommand(CustomerRequestDto dto) =>
             new CreateCustomerCommand(dto.FirstName, dto.Surname, dto.EmailAddress, dto.Password);
+
+        private CustomerResponseDto MapToResponseDto(Customer customer) => new CustomerResponseDto
+        {
+            Id = customer.Id,
+            EmailAddress = customer.EmailAddress.ToString(),
+            FirstName = customer.FirstName,
+            Surname = customer.Surname,
+            Password = customer.Password
+        };
     }
 }

@@ -95,6 +95,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
         [InlineData(NEW_FIRST_NAME, "", NEW_EMAIL_ADDRESS, NEW_PASSWORD)]
         [InlineData(NEW_FIRST_NAME, NEW_SURNAME, null, NEW_PASSWORD)]
         [InlineData(NEW_FIRST_NAME, NEW_SURNAME, "", NEW_PASSWORD)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, "invalidEmailAddress", NEW_PASSWORD)]
         [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, null)]
         [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, "")]
         public void ShouldThrowValidationException_WhenOneOfRequiredFieldIsNullOrEmpty(string firstName, string surname, string emailAddress, string password)

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-  	<InternalsVisibleTo Include="GlobalBlue.CustomerManager.Application.UnitTests"/>
+  	<InternalsVisibleTo Include="GlobalBlue.CustomerManager.Application.UnitTests" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,6 @@
-﻿namespace GlobalBlue.CustomerManager.Application.Entities
+﻿using GlobalBlue.CustomerManager.Application.ValueObjects;
+
+namespace GlobalBlue.CustomerManager.Application.Entities
 {
     public sealed class Customer
     {
@@ -8,7 +10,7 @@
 
         public string Surname { get; set; }
 
-        public string EmailAddress { get; set; }
+        public EmailAddress EmailAddress { get; set; }
 
         public string Password { get; set; }
     }

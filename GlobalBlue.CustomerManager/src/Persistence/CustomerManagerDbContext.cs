@@ -17,8 +17,15 @@ namespace GlobalBlue.CustomerManager.Persistence
 
             modelBuilder.Entity<Customer>().Property(c => c.FirstName).IsRequired().HasMaxLength(100);
             modelBuilder.Entity<Customer>().Property(c => c.Surname).IsRequired().HasMaxLength(100);
-            modelBuilder.Entity<Customer>().Property(c => c.EmailAddress).IsRequired().HasMaxLength(100);
             modelBuilder.Entity<Customer>().Property(c => c.Password).IsRequired();
+            modelBuilder
+                .Entity<Customer>()
+                .Property(c => c.EmailAddress)
+                .HasConversion(
+                    convertToProviderExpression: value => value.ToString(),
+                    convertFromProviderExpression: value => value)
+                .IsRequired()
+                .HasMaxLength(100);
 
             modelBuilder.Entity<Customer>().HasIndex(c => c.EmailAddress).IsUnique();
         }
