@@ -22,6 +22,12 @@ namespace GlobalBlue.CustomerManager.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_EmailAddress",
+                table: "Customers",
+                column: "EmailAddress",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

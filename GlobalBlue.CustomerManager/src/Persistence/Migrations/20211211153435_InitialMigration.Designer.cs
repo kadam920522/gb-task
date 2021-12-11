@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GlobalBlue.CustomerManager.Persistence.Migrations
 {
     [DbContext(typeof(CustomerManagerDbContext))]
-    [Migration("20211209082449_InitialMigration")]
+    [Migration("20211211153435_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -17,7 +17,7 @@ namespace GlobalBlue.CustomerManager.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.21")
+                .HasAnnotation("ProductVersion", "3.1.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("GlobalBlue.CustomerManager.Application.Entities.Customer", b =>
@@ -47,6 +47,9 @@ namespace GlobalBlue.CustomerManager.Persistence.Migrations
                         .HasMaxLength(100);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailAddress")
+                        .IsUnique();
 
                     b.ToTable("Customers");
                 });
