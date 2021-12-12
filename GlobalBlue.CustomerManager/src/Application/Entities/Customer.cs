@@ -13,5 +13,7 @@ namespace GlobalBlue.CustomerManager.Application.Entities
         public EmailAddress EmailAddress { get; set; }
 
         public string Password { get; set; }
+
+        public uint xmin { get; set; }
     }
 }

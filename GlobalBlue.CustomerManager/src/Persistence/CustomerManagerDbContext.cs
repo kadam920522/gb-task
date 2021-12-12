@@ -1,5 +1,8 @@
 ﻿using GlobalBlue.CustomerManager.Application.Entities;
+using GlobalBlue.CustomerManager.Application.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GlobalBlue.CustomerManager.Persistence
 {
@@ -28,6 +31,20 @@ namespace GlobalBlue.CustomerManager.Persistence
                 .HasMaxLength(100);
 
             modelBuilder.Entity<Customer>().HasIndex(c => c.EmailAddress).IsUnique();
+
+            modelBuilder.Entity<Customer>().UseXminAsConcurrencyToken();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await base.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new CustomerChangedExcepion(ex);
+            }
         }
     }
 }

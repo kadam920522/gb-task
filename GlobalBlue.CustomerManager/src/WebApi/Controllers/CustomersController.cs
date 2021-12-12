@@ -1,8 +1,8 @@
 ﻿using GlobalBlue.CustomerManager.Application.Create;
-using GlobalBlue.CustomerManager.Application.Entities;
 using GlobalBlue.CustomerManager.Application.Retrieve.GetAll;
 using GlobalBlue.CustomerManager.Application.Retrieve.GetById;
 using GlobalBlue.CustomerManager.Application.Update;
+using GlobalBlue.CustomerManager.WebApi.OperationProcessors;
 using GlobalBlue.CustomerManager.WebApi.ProblemDetails;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -40,10 +40,12 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerResponseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         [OpenApiOperation("Fetch the specified customer", "This endpoint tends to return the customer by the specified id.")]
+        [OpenApiOperationProcessor(typeof(AddETagResponseHeaderProcessor))]
         public async Task<IActionResult> Get(int id)
         {
             var customer = await _sender.Send(new GetCustomerByIdQuery(id));
 
+            Response.Headers["ETag"] = customer.xmin.ToString();
             return Ok(CustomerResponseDto.MapFrom(customer));
         }
 
@@ -67,16 +69,18 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Microsoft.AspNetCore.Mvc.ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ValidationProblemDetails))]
         [OpenApiOperation("Update the specified customer", "This endpoint tends to update customer specified by it's id.")]
+        [OpenApiOperationProcessor(typeof(AddIfMatchHeaderParameterProcessor))]
         public async Task<IActionResult> Put(int id, [FromBody] CustomerRequestDto dto)
         {
-            var command = MapToCommand(id, dto);
+            var eTag = Request.Headers["If-Match"];
+            var command = MapToCommand(id, eTag, dto);
             await _sender.Send(command);
 
             return NoContent();
         }
 
-        private UpdateCustomerCommand MapToCommand(int id, CustomerRequestDto dto) =>
-            new UpdateCustomerCommand(id, dto.FirstName, dto.Surname, dto.EmailAddress, dto.Password);
+        private UpdateCustomerCommand MapToCommand(int id, string eTag, CustomerRequestDto dto) =>
+            new UpdateCustomerCommand(eTag, id, dto.FirstName, dto.Surname, dto.EmailAddress, dto.Password);
 
         private CreateCustomerCommand MapToCommand(CustomerRequestDto dto) =>
             new CreateCustomerCommand(dto.FirstName, dto.Surname, dto.EmailAddress, dto.Password);

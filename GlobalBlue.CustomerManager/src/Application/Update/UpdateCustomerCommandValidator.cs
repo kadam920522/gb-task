@@ -11,6 +11,7 @@ namespace GlobalBlue.CustomerManager.Application.Update
             RuleFor(command => command.NewSurname).NotNull().NotEmpty();
             RuleFor(command => command.NewEmailAddress).NotNull().NotEmpty().Must(emailAddress => EmailAddress.IsValid(emailAddress));
             RuleFor(command => command.NewPassword).NotNull().NotEmpty();
+            RuleFor(command => command.ETag).NotNull().NotEmpty().Must(etag => uint.TryParse(etag, out _));
         }
     }
 }

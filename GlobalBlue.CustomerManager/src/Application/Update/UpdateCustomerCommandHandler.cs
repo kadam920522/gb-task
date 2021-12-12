@@ -23,6 +23,8 @@ namespace GlobalBlue.CustomerManager.Application.Update
 
             if (customer is null) throw new CustomerNotFoundException(request.CustomerId);
 
+            if (customer.xmin != request.ETagAsXmin) throw new CustomerChangedExcepion();
+
             if(customer.EmailAddress != request.NewEmailAddress)
             {
                 var existingCustomer = await _customerStorage.GetByEmailAddressAsync(request.NewEmailAddress);

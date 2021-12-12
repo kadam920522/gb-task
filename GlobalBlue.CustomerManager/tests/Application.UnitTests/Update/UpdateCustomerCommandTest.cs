@@ -14,6 +14,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
     public sealed class UpdateCustomerCommandTest : ApplicationTestBase
     {
         private const int CUSTOMER_ID = 5;
+        private const string ETAG = "643244321";
         private const string NEW_FIRST_NAME = "FirstName";
         private const string NEW_SURNAME = "Surname";
         private const string NEW_EMAIL_ADDRESS = "email@domain.com";
@@ -26,7 +27,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
             // Arrange
             const int NOT_EXISTING_CUSTOMER_ID = 5;
 
-            var command = new UpdateCustomerCommand(NOT_EXISTING_CUSTOMER_ID, NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD);
+            var command = new UpdateCustomerCommand(ETAG, NOT_EXISTING_CUSTOMER_ID, NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD);
 
             _customerStorageMock.Setup(storage => storage.GetByIdAsync(NOT_EXISTING_CUSTOMER_ID)).ReturnsAsync((Customer)null);
 
@@ -47,7 +48,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
             var customerExistingWithTheEmailAddress = new Customer();
             _customerStorageMock.Setup(storage => storage.GetByEmailAddressAsync(NEW_EMAIL_ADDRESS)).ReturnsAsync(customerExistingWithTheEmailAddress);
 
-            var command = new UpdateCustomerCommand(CUSTOMER_ID, NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD);
+            var command = new UpdateCustomerCommand(ETAG, CUSTOMER_ID, NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD);
 
             // Act
             Func<Task> act = () => _sender.Send(command);
@@ -70,7 +71,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
 
             _passwordHasherMock.Setup(hasher => hasher.Hash(NEW_PASSWORD)).Returns(HASHED_PASSWORD);
 
-            var command = new UpdateCustomerCommand(CUSTOMER_ID, NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD);
+            var command = new UpdateCustomerCommand(ETAG, CUSTOMER_ID, NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD);
 
             var expectedCustomer = new Customer 
             { 
@@ -101,7 +102,7 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
         public void ShouldThrowValidationException_WhenOneOfRequiredFieldIsNullOrEmpty(string firstName, string surname, string emailAddress, string password)
         {
             // Arrange
-            var invalidCommand = new UpdateCustomerCommand(customerId: It.IsAny<int>(), firstName, surname, emailAddress, password);
+            var invalidCommand = new UpdateCustomerCommand(ETAG, customerId: It.IsAny<int>(), firstName, surname, emailAddress, password);
 
             // Act
             Func<Task> act = () => _sender.Send(invalidCommand);

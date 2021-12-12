@@ -31,6 +31,8 @@ namespace GlobalBlue.CustomerManager.WebApi.Extensions
 
             options.MapToStatusCode<CustomerNotFoundException>(StatusCodes.Status404NotFound);
 
+            options.MapToStatusCode<CustomerChangedExcepion>(StatusCodes.Status412PreconditionFailed);
+
             // Because exceptions are handled polymorphically, this will act as a "catch all" mapping, which is why it's added last.
             // If an exception other than NotImplementedException and HttpRequestException is thrown, this will handle it.
             options.MapToStatusCode<Exception>(StatusCodes.Status500InternalServerError);
