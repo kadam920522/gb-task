@@ -1,10 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
 	<AssemblyName>GlobalBlue.CustomerManager.Persistence</AssemblyName>
 	<RootNamespace>GlobalBlue.CustomerManager.Persistence</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+  	<InternalsVisibleTo Include="GlobalBlue.CustomerManager.WebApi.IntegrationTests"/>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.18" />

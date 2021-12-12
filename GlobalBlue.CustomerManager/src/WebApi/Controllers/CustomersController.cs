@@ -33,7 +33,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         public async Task<IActionResult> Get()
         {
             var customers = await _sender.Send(new GetAllCustomerQuery());
-            return Ok(customers.Select(customer => MapToResponseDto(customer)));
+            return Ok(customers.Select(customer => CustomerResponseDto.MapFrom(customer)));
         }
 
         [HttpGet("{id}")]
@@ -44,7 +44,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         {
             var customer = await _sender.Send(new GetCustomerByIdQuery(id));
 
-            return Ok(MapToResponseDto(customer));
+            return Ok(CustomerResponseDto.MapFrom(customer));
         }
 
         [HttpPost]
@@ -58,7 +58,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
             var command = MapToCommand(dto);
             var newCustomer = await _sender.Send(command);
 
-            return CreatedAtAction(nameof(Get), new { id = newCustomer.Id }, MapToResponseDto(newCustomer));
+            return CreatedAtAction(nameof(Get), new { id = newCustomer.Id }, CustomerResponseDto.MapFrom(newCustomer));
         }
 
         [HttpPut("{id}")]
@@ -80,14 +80,5 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
 
         private CreateCustomerCommand MapToCommand(CustomerRequestDto dto) =>
             new CreateCustomerCommand(dto.FirstName, dto.Surname, dto.EmailAddress, dto.Password);
-
-        private CustomerResponseDto MapToResponseDto(Customer customer) => new CustomerResponseDto
-        {
-            Id = customer.Id,
-            EmailAddress = customer.EmailAddress.ToString(),
-            FirstName = customer.FirstName,
-            Surname = customer.Surname,
-            Password = customer.Password
-        };
     }
 }
