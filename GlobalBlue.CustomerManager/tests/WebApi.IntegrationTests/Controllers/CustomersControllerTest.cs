@@ -1,12 +1,9 @@
-﻿using DotNet.Testcontainers.Containers.Builders;
-using DotNet.Testcontainers.Containers.Configurations.Databases;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalBlue.CustomerManager.Application.Entities;
 using GlobalBlue.CustomerManager.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
+using Npgsql;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -18,40 +15,33 @@ using CustomerResponseDto = GlobalBlue.CustomerManager.WebApi.DataTransferObject
 
 namespace GlobalBlue.CustomerManager.WebApi.IntegrationTests.Controllers
 {
-    public class CustomersControllerTest : IClassFixture<WebApplicationFactory<Startup>>, IAsyncLifetime
+    public class CustomersControllerTest : IClassFixture<WebApiTestFixture>, IAsyncLifetime
     {
         private readonly WebApplicationFactory<Startup> _factory;
-        private readonly PostgresSqlTestcontainerDatabase _postgreSqlTestcontainer;
+        private readonly string _connectionString;
+        private readonly HttpClient _client;
 
-        public CustomersControllerTest(WebApplicationFactory<Startup> factory)
+        public CustomersControllerTest(WebApiTestFixture fixture)
         {
-            _postgreSqlTestcontainer = CreatePostgreSqlTestcontainerDatabase();
-            Environment.SetEnvironmentVariable("DbConnectionString", _postgreSqlTestcontainer.ConnectionString);
-            _factory = factory;
+            _factory = fixture.Factory;
+            _connectionString = fixture.ConnectionString;
+            _client = fixture.Client;
         }
 
-        public async Task DisposeAsync()
-        {
-            Environment.SetEnvironmentVariable("DbConnectionString", string.Empty);
-            await _postgreSqlTestcontainer.DisposeAsync();
-        }
+        public async Task InitializeAsync() => await TruncateTableAsync();
 
-        public async Task InitializeAsync()
-        {
-            await _postgreSqlTestcontainer.StartAsync();
-        }
+        public Task DisposeAsync() => Task.CompletedTask;
 
         [Fact]
         public async Task GetAllCustomers_Test()
         {
             // Arrange
-            var client = _factory.CreateClient();
             var testCustomers = GetTestCustomers();
             await SetupTestCustomers(testCustomers);
             var expectedCustomers = testCustomers.Select(customer => CustomerResponseDto.MapFrom(customer));
 
             // Act
-            var response = await client.GetAsync("api/customers");
+            var response = await _client.GetAsync("api/customers");
 
             // Assert
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
@@ -72,18 +62,16 @@ namespace GlobalBlue.CustomerManager.WebApi.IntegrationTests.Controllers
             var testCustomers = GetTestCustomers().ToList();
             testCustomers.Add(new Customer { EmailAddress = EMAIL_ADDRESS, FirstName = FIRST_NAME, Surname = SURNAME, Password = PASSWORD });
 
-            var client = _factory.CreateClient();
-            
             await SetupTestCustomers(testCustomers);
-            var expectedCustomer = new CustomerResponseDto { Id = CUSTOMER_ID, EmailAddress = EMAIL_ADDRESS, Password = PASSWORD, FirstName = FIRST_NAME, Surname = SURNAME };
+            var expectedCustomerResponse = new CustomerResponseDto { Id = CUSTOMER_ID, EmailAddress = EMAIL_ADDRESS, Password = PASSWORD, FirstName = FIRST_NAME, Surname = SURNAME };
 
             // Act
-            var response = await client.GetAsync($"api/customers/{CUSTOMER_ID}");
+            var response = await _client.GetAsync($"api/customers/{CUSTOMER_ID}");
 
             // Assert
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
             var responseCustomer = await response.Content.ReadFromJsonAsync<CustomerResponseDto>();
-            responseCustomer.Should().BeEquivalentTo(expectedCustomer);
+            responseCustomer.Should().BeEquivalentTo(expectedCustomerResponse);
         }
 
         [Fact]
@@ -98,10 +86,8 @@ namespace GlobalBlue.CustomerManager.WebApi.IntegrationTests.Controllers
             var createCustomerRequestBody = new CustomerRequestDto { EmailAddress = EMAIL_ADDRESS, FirstName = FIRST_NAME, Surname = SURNAME, Password = PASSWORD };
             var expectedCustomer = new CustomerResponseDto { Id = 1, EmailAddress = EMAIL_ADDRESS, FirstName = FIRST_NAME, Surname = SURNAME };
 
-            var client = _factory.CreateClient();
-
             // Act
-            var response = await client.PostAsync($"api/customers", JsonContent.Create(createCustomerRequestBody));
+            var response = await _client.PostAsync($"api/customers", JsonContent.Create(createCustomerRequestBody));
 
             // Assert
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
@@ -122,16 +108,14 @@ namespace GlobalBlue.CustomerManager.WebApi.IntegrationTests.Controllers
 
             var updateCustomerRequestBody = new CustomerRequestDto { EmailAddress = NEW_EMAIL_ADDRESS, FirstName = NEW_FIRST_NAME, Surname = NEW_SURNAME, Password = NEW_PASSWORD };
 
-            var client = _factory.CreateClient();
-
             var originalCustomer = new Customer { EmailAddress = "original@domain.com", FirstName = "original", Surname = "original", Password = "original_hashed" };
             await SetupTestCustomers(new[] { originalCustomer });
 
             var expectedCustomerResponse = new CustomerResponseDto { Id = originalCustomer.Id, EmailAddress = NEW_EMAIL_ADDRESS, FirstName = NEW_FIRST_NAME, Surname = NEW_SURNAME };
 
             // Act
-            var response = await client.PutAsync($"api/customers/{originalCustomer.Id}", JsonContent.Create(updateCustomerRequestBody));
-            var updatedCustomerResponse = await GetUpdatedCustomer(client, originalCustomer.Id);
+            var response = await _client.PutAsync($"api/customers/{originalCustomer.Id}", JsonContent.Create(updateCustomerRequestBody));
+            var updatedCustomerResponse = await GetUpdatedCustomer(originalCustomer.Id);
 
             // Assert
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
@@ -139,9 +123,9 @@ namespace GlobalBlue.CustomerManager.WebApi.IntegrationTests.Controllers
             updatedCustomerResponse.Password.Should().NotBeNullOrWhiteSpace();
         }
 
-        private async Task<CustomerResponseDto> GetUpdatedCustomer(HttpClient client, int customerId)
+        private async Task<CustomerResponseDto> GetUpdatedCustomer(int customerId)
         {
-            var response = await client.GetAsync($"api/customers/{customerId}");
+            var response = await _client.GetAsync($"api/customers/{customerId}");
             return await response.Content.ReadFromJsonAsync<CustomerResponseDto>();
         }
 
@@ -159,15 +143,17 @@ namespace GlobalBlue.CustomerManager.WebApi.IntegrationTests.Controllers
                 new Customer{EmailAddress = "test2@domain.com", FirstName = "Jane", Surname = "Doe", Password = "hashedpassw"}
             };
 
-        private PostgresSqlTestcontainerDatabase CreatePostgreSqlTestcontainerDatabase() =>
-            new TestcontainersBuilder<PostgresSqlTestcontainerDatabase>()
-            .WithDatabase(new PostgreSqlTestcontainerConfiguration
+        private async Task TruncateTableAsync()
+        {
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+
+            await using (var cmd = conn.CreateCommand())
             {
-                Database = "db",
-                Username = "postgres",
-                Password = "postgres",
-            })
-            .WithPortBinding(5433, 5432)
-            .Build();
+                cmd.CommandText = "TRUNCATE TABLE \"Customers\" RESTART IDENTITY;";
+                await cmd.ExecuteNonQueryAsync();
+            }
+
+        }
     }
 }
