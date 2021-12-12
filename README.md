@@ -18,3 +18,6 @@ Here you can see the descriptions of the Web API endpoints and can try them out.
 
 ### Postman Requests
 I also added [Postman](https://www.postman.com/) request collection with valid sample input data to the repository for testing purpose which can be imported.
+
+### Integration Tests
+The solution contains integration tests which use Testcontainer for Postgresql. In order to run them successfully, docker should be up and running.
