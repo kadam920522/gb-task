@@ -72,7 +72,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
         [OpenApiOperationProcessor(typeof(AddIfMatchHeaderParameterProcessor))]
         public async Task<IActionResult> Put(int id, [FromBody] CustomerRequestDto dto)
         {
-            var eTag = Request.Headers["If-Match"];
+            var eTag = GetStrippedETag();
             var command = MapToCommand(id, eTag, dto);
             await _sender.Send(command);
 
@@ -84,5 +84,7 @@ namespace GlobalBlue.CustomerManager.WebApi.Controllers
 
         private CreateCustomerCommand MapToCommand(CustomerRequestDto dto) =>
             new CreateCustomerCommand(dto.FirstName, dto.Surname, dto.EmailAddress, dto.Password);
+
+        private string GetStrippedETag() => Request.Headers["If-Match"].ToString().Replace("\"", string.Empty);
     }
 }

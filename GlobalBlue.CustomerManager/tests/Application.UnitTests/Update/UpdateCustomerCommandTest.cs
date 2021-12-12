@@ -62,8 +62,9 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
         {
             // Arrange
             const string HASHED_PASSWORD = "hashed_password";
+            uint xmin = uint.Parse(ETAG);
 
-            var customerToBeUpdated = new Customer { Id = CUSTOMER_ID, EmailAddress = ORIGINAL_EMAIL_ADDRESS };
+            var customerToBeUpdated = new Customer { Id = CUSTOMER_ID, EmailAddress = ORIGINAL_EMAIL_ADDRESS, xmin = xmin };
             _customerStorageMock.Setup(storage => storage.GetByIdAsync(CUSTOMER_ID)).ReturnsAsync(customerToBeUpdated);
 
             var customerExistingWithTheEmailAddress = new Customer();
@@ -79,7 +80,8 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
                 EmailAddress = NEW_EMAIL_ADDRESS, 
                 FirstName = NEW_FIRST_NAME, 
                 Surname = NEW_SURNAME, 
-                Password = HASHED_PASSWORD 
+                Password = HASHED_PASSWORD,
+                xmin = xmin
             };
 
             // Act
@@ -90,16 +92,19 @@ namespace GlobalBlue.CustomerManager.Application.UnitTests.Update
         }
 
         [Theory]
-        [InlineData(null, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD)]
-        [InlineData("", NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD)]
-        [InlineData(NEW_FIRST_NAME, null, NEW_EMAIL_ADDRESS, NEW_PASSWORD)]
-        [InlineData(NEW_FIRST_NAME, "", NEW_EMAIL_ADDRESS, NEW_PASSWORD)]
-        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, null, NEW_PASSWORD)]
-        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, "", NEW_PASSWORD)]
-        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, "invalidEmailAddress", NEW_PASSWORD)]
-        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, null)]
-        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, "")]
-        public void ShouldThrowValidationException_WhenOneOfRequiredFieldIsNullOrEmpty(string firstName, string surname, string emailAddress, string password)
+        [InlineData(null, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD, ETAG)]
+        [InlineData("", NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD, ETAG)]
+        [InlineData(NEW_FIRST_NAME, null, NEW_EMAIL_ADDRESS, NEW_PASSWORD, ETAG)]
+        [InlineData(NEW_FIRST_NAME, "", NEW_EMAIL_ADDRESS, NEW_PASSWORD, ETAG)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, null, NEW_PASSWORD, ETAG)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, "", NEW_PASSWORD, ETAG)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, "invalidEmailAddress", NEW_PASSWORD, ETAG)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, null, ETAG)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, "", ETAG)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD, null)]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD, "")]
+        [InlineData(NEW_FIRST_NAME, NEW_SURNAME, NEW_EMAIL_ADDRESS, NEW_PASSWORD, "invalidEtag")]
+        public void ShouldThrowValidationException_WhenOneOfRequiredFieldIsNullOrEmpty(string firstName, string surname, string emailAddress, string password, string eTag)
         {
             // Arrange
             var invalidCommand = new UpdateCustomerCommand(ETAG, customerId: It.IsAny<int>(), firstName, surname, emailAddress, password);

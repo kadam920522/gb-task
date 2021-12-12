@@ -113,14 +113,49 @@ namespace GlobalBlue.CustomerManager.WebApi.IntegrationTests.Controllers
 
             var expectedCustomerResponse = new CustomerResponseDto { Id = originalCustomer.Id, EmailAddress = NEW_EMAIL_ADDRESS, FirstName = NEW_FIRST_NAME, Surname = NEW_SURNAME };
 
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/customers/{originalCustomer.Id}")
+            {
+                Content = JsonContent.Create(updateCustomerRequestBody)
+            };
+
+            request.Headers.IfMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue($"\"{originalCustomer.xmin}\""));
+
             // Act
-            var response = await _client.PutAsync($"api/customers/{originalCustomer.Id}", JsonContent.Create(updateCustomerRequestBody));
+            var response = await _client.SendAsync(request);
             var updatedCustomerResponse = await GetUpdatedCustomer(originalCustomer.Id);
 
             // Assert
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
             updatedCustomerResponse.Should().BeEquivalentTo(expectedCustomerResponse, options => options.Excluding(c => c.Password));
             updatedCustomerResponse.Password.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public async Task UpdateCustomer_ConcurrencyIssue_Test()
+        {
+            // Arrange
+            const string NEW_EMAIL_ADDRESS = "test3@domain.com";
+            const string NEW_FIRST_NAME = "Jose";
+            const string NEW_SURNAME = "DeMarco";
+            const string NEW_PASSWORD = "hashedpassword";
+
+            var updateCustomerRequestBody = new CustomerRequestDto { EmailAddress = NEW_EMAIL_ADDRESS, FirstName = NEW_FIRST_NAME, Surname = NEW_SURNAME, Password = NEW_PASSWORD };
+
+            var originalCustomer = new Customer { EmailAddress = "original@domain.com", FirstName = "original", Surname = "original", Password = "original_hashed" };
+            await SetupTestCustomers(new[] { originalCustomer });
+
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/customers/{originalCustomer.Id}")
+            {
+                Content = JsonContent.Create(updateCustomerRequestBody)
+            };
+
+            request.Headers.IfMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue($"\"{originalCustomer.xmin - 1}\""));
+
+            // Act
+            var response = await _client.SendAsync(request);
+
+            // Assert
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.PreconditionFailed);
         }
 
         private async Task<CustomerResponseDto> GetUpdatedCustomer(int customerId)
